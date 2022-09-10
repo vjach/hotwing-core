@@ -68,6 +68,8 @@ class GenericGcodeFormatter(GcodeFormatterBase):
     def start_commands(self):
         out = []
 
+        # Perform homing
+        out.append("$H")
         # Set feedrate
         out.append("F%s" % self.parent.feedrate)
 
@@ -88,10 +90,10 @@ class GenericGcodeFormatter(GcodeFormatterBase):
         # Control path mode
         # G64 - Set Blended Path Control Mode
         # Set path tolerance using P value
-        if self.parent.units.lower() == "inches":
-            out.append("G64 P%.6f" % (1.0/64) )
-        elif self.parent.units.lower() == "millimeters":
-            out.append("G64 P%.2f" % (0.5) )
+        #if self.parent.units.lower() == "inches":
+        #    out.append("G64 P%.6f" % (1.0/64) )
+        #elif self.parent.units.lower() == "millimeters":
+        #    out.append("G64 P%.2f" % (0.5) )
         
 
         # Use first work offset
