@@ -55,10 +55,10 @@ class GenericGcodeFormatter(GcodeFormatterBase):
             cmd_list.append("u%.10f" % self.last_command['u'])
 
         if 'v' in d:
-            cmd_list.append("v%.10f" % d['v'])
+            cmd_list.append("z%.10f" % d['v'])
             self.last_command['v'] = d['v']
         else:
-            cmd_list.append("v%.10f" % self.last_command['v'])
+            cmd_list.append("z%.10f" % self.last_command['v'])
 
 
         return " ".join(cmd_list)
@@ -96,7 +96,7 @@ class GenericGcodeFormatter(GcodeFormatterBase):
 
         # Use first work offset
         out.append("G54")
-        self.last_command = {'x':0,'y':0,'u':0,'v':0}
+        self.last_command = {'x':0,'y':0,'u':0,'z':0}
 
 
         return out
