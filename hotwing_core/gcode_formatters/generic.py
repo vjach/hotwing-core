@@ -72,6 +72,10 @@ class GenericGcodeFormatter(GcodeFormatterBase):
         out.append("$H")
         # Set feedrate
         out.append("F%s" % self.parent.feedrate)
+        # Set heater
+        out.append("S%s" % 350)
+        # Set heater
+        out.append("M3")
 
         ## Working Plane
         out.append("G17") # is this necessary?

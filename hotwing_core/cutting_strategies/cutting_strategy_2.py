@@ -3,6 +3,8 @@ from ..profile import Profile
 from ..coordinate import Coordinate
 from .base import CuttingStrategyBase
 import logging
+import numpy as np
+
 logging.getLogger(__name__)
 
 
@@ -157,6 +159,8 @@ class CuttingStrategy2(CuttingStrategyBase):
             # MOVE UP TO SAFE HEIGHT
             self._move_to_safe_height()
 
+        self._cut_spar(profile1, profile2, dwell_time)
+
 
 
     def _cut_top_profile(self, profile1, profile2, dwell_time):
@@ -187,7 +191,6 @@ class CuttingStrategy2(CuttingStrategyBase):
 
 
     def _cut_bottom_profile(self, profile1, profile2, dwell_time):
-        # cutting profile from right to left
         c1 = profile1.top.coordinates[0]
         c2 = profile2.top.coordinates[0]
         # cut bottom profile
@@ -205,4 +208,22 @@ class CuttingStrategy2(CuttingStrategyBase):
                 # dwell on first point
                 self.machine.gc.dwell(dwell_time)
 
+        # TODO: cut to last point
+
         self.machine.gc.dwell(dwell_time)
+
+    def _cut_spar(self, profile1, profile2, dwell_time):
+        spar1_center = np.array([profile1.spar_center.x, profile1.spar_center.y])
+        spar2_center = np.array([profile2.spar_center.x, profile2.spar_center.y])
+ 
+        self.machine.gc.fast_move( {'x':spar1_center[0] + profile1.spar_radius, 'y':self.machine.foam_height*1.1, 'u':spar2_center[0] + profile2.spar_radius, 'v':self.machine.foam_height*1.1})
+        self.machine.gc.move(self.machine.calculate_move(Coordinate(*spar1_center), Coordinate(*spar2_center)))
+        spar_points = 360
+        for i in range(spar_points):
+            c1 = spar1_center + profile1.spar_radius * np.array([np.cos(2 * np.pi * i / spar_points), np.sin(2 * np.pi * i / spar_points)])
+            c2 = spar2_center + profile2.spar_radius * np.array([np.cos(2 * np.pi * i / spar_points), np.sin(2 * np.pi * i / spar_points)])
+            c1 = Coordinate(*c1)
+            c2 = Coordinate(*c2)
+            self.machine.gc.move(self.machine.calculate_move(c1, c2))
+
+        self.machine.gc.move(self.machine.calculate_move(Coordinate(*spar1_center), Coordinate(*spar2_center)))

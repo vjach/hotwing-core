@@ -42,11 +42,12 @@ class Rib():
     """
     
     def __init__(self, foil_data, scale=None, xy_offset=None, top_sheet=0,
-                 bottom_sheet=0, front_stock=0, tail_stock=0, rotation=0, rotation_pos=0.5):
+                 bottom_sheet=0, front_stock=0, tail_stock=0, rotation=0, rotation_pos=0.5, spar_center=None, spar_radius=0):
         if isinstance(foil_data, Profile):
             self.foil_definition = foil_data
         else:
             self.foil_definition = Profile(foil_data)
+        self.foil_definition.set_spar(spar_center, spar_radius)
         self.scale = scale
         self.xy_offset = xy_offset
         self.top_sheet = top_sheet
@@ -55,6 +56,8 @@ class Rib():
         self.tail_stock = tail_stock
         self.rotation = rotation
         self.rotation_pos = rotation_pos
+        self.spar_center = spar_center
+        self.spar_radius = spar_radius
 
     @property
     def airfoil_profile(self):
@@ -72,6 +75,7 @@ class Rib():
             p = Profile.rotate(Coordinate(mid_point, 0), p, -self.rotation)
         if self.xy_offset:
             p = Profile.translate(p, self.xy_offset)
+
         return p
 
     @property

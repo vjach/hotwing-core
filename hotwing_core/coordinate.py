@@ -73,6 +73,10 @@ class Coordinate():
         qy = oy + math.sin(angle) * (px - ox) + math.cos(angle) * (py - oy)
         return cls(qx, qy)
 
+    @classmethod
+    def translate(cls, point, offset):
+        return cls(point.x + offset.x, point.y + offset.y)
+
     def __str__(self):
         return "%.5f, %.5f" % (self.x, self.y)
 

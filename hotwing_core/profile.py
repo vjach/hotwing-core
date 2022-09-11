@@ -46,6 +46,8 @@ class Profile():
     """
 
     def __init__(self, *args):
+        self.spar_center = None
+        self.spar_radius = 0
         
         if len(args) == 1 and isinstance(args[0], list):
             # list of coordinates
@@ -129,6 +131,10 @@ class Profile():
         average_y = (top_c.y + bottom_c.y) / 2
         return Coordinate(max_x, average_y)
 
+    def set_spar(self, center, radius):
+        self.spar_center = center
+        self.spar_radius = radius
+
     @classmethod
     def rotate(cls, origin, profile, angle):
         """
@@ -144,7 +150,10 @@ class Profile():
         """
         top_coords = Surface.rotate(origin, profile.top, angle)
         bot_coords = Surface.rotate(origin, profile.bottom, angle)
-        return cls(top_coords, bot_coords)
+        
+        ret = cls(top_coords, bot_coords)
+        ret.set_spar(Coordinate.rotate(origin, self.spar_center, angle), self.spar_radius)
+        return ret
 
     @classmethod
     def copy(cls, profile):
@@ -159,7 +168,9 @@ class Profile():
         """
         top = profile.top
         bottom = profile.bottom
-        return Profile(top, bottom)
+        ret = Profile(top, bottom)
+        ret.set_spar(profile.spar_center, profile.spar_radius)
+        return ret
 
     @classmethod
     def scale(cls, profile, scale):
@@ -178,7 +189,9 @@ class Profile():
         """
         top = Surface.scale(profile.top, scale)
         bottom = Surface.scale(profile.bottom, scale)
-        return Profile(top, bottom)
+        ret = Profile(top, bottom)
+        ret.set_spar(profile.spar_center, profile.spar_radius)
+        return ret
 
 
     @classmethod
@@ -198,7 +211,9 @@ class Profile():
         """
         top = Surface.translate(profile.top, offset)
         bottom = Surface.translate(profile.bottom, offset)
-        return Profile(top, bottom)
+        ret =  Profile(top, bottom)
+        ret.set_spar(Coordinate.translate(profile.spar_center, offset), profile.spar_radius)
+        return ret
 
     @classmethod
     def offset_around_profile(cls, profile, top_offset, bottom_offset):
@@ -220,7 +235,9 @@ class Profile():
         """
         top = Surface.offset_around_surface(profile.top, top_offset)
         bottom = Surface.offset_around_surface(profile.bottom, -bottom_offset)
-        return Profile(top, bottom)
+        ret = Profile(top, bottom)
+        ret.set_spar(profile.spar_center, profile.spar_radius)
+        return ret
 
     @classmethod
     def trim(cls, profile, x_min=None, x_max=None):
@@ -242,7 +259,9 @@ class Profile():
         """
         top = Surface.trim(profile.top, x_min, x_max)
         bottom = Surface.trim(profile.bottom, x_min, x_max)
-        return Profile(top, bottom)
+        ret = Profile(top, bottom)
+        ret.set_spar(profile.spar_center, profile.spar_radius)
+        return ret
 
     @classmethod
     def trim_overlap(cls, profile):
@@ -289,7 +308,9 @@ class Profile():
             p1.top, p2.top, dist_between, dist_interp, points)
         bot = Surface.interpolate_new_surface(
             p1.bottom, p2.bottom, dist_between, dist_interp, points)
-        return Profile(top, bot)
+        ret = Profile(top, bot)
+        ret.set_spar(profile.spar_center, profile.spar_radius)
+        return ret
 
     def _load_dat_file(self, f):
         """
